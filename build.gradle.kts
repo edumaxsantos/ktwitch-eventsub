@@ -25,3 +25,22 @@ tasks.test {
 kotlin {
     jvmToolchain(22)
 }
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/edumaxsantos/ktwitch-eventsub")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+
+    publications {
+        register<MavenPublication>("gpr") {
+            from(components["kotlin"])
+        }
+    }
+}
