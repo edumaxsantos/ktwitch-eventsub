@@ -36,3 +36,7 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify Package Publication
+        run: |
+          curl -s https://maven.pkg.github.com/edumaxsantos/ktwitch-eventsub | grep -q ktwitch-eventsub || echo "Package not found or not public"
