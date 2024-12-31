@@ -30,31 +30,26 @@ jobs:
       - name: Debug GPG Key Import
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
-          echo "Listing imported GPG keys:"
-          gpg --list-keys
 
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
+          # Configure GPG for non-interactive use
+      - name: Configure GPG
+        run: |
+         echo "use-agent" >> ~/.gnupg/gpg.conf
+         echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+
       - name: Publish package
         run: ./gradlew publish
         env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify Package Publication
         run: |
           curl -s https://maven.pkg.github.com/edumaxsantos/ktwitch-eventsub | grep -q ktwitch-eventsub || echo "Package not found or not public"
-          
-
-        # Publish to Maven Central
-      - name: Publish to Maven Central
-        run: ./gradlew publish closeAndReleaseRepository
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
