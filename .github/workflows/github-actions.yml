@@ -46,6 +46,9 @@ jobs:
       - name: Debug GPG Configuration
         run: cat ~/.gnupg/gpg.conf
 
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
       - name: Publish to Maven Central
         run: ./gradlew publish --info
         env:
