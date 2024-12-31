@@ -63,8 +63,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      # Step 7: Grant Execute Permission for Gradle Wrapper
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
 
       # Step 8: Publish to Maven Central
       - name: Publish to Maven Central
