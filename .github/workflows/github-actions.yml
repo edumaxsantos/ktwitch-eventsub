@@ -40,3 +40,11 @@ jobs:
       - name: Verify Package Publication
         run: |
           curl -s https://maven.pkg.github.com/edumaxsantos/ktwitch-eventsub | grep -q ktwitch-eventsub || echo "Package not found or not public"
+
+        # Publish to Maven Central
+      - name: Publish to Maven Central
+        run: ./gradlew publish closeAndReleaseRepository
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}

@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.1.0"
     kotlin("plugin.serialization") version "2.1.0"
+    signing
     `maven-publish`
 }
 
@@ -29,17 +30,6 @@ kotlin {
 }
 
 publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.$basicUrl")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-
     publications {
         register<MavenPublication>("gpr") {
             from(components["kotlin"])
@@ -69,10 +59,26 @@ publishing {
 
                 scm {
                     connection.set("scm:git:git://$basicUrl.git")
-                    developerConnection.set("scm:git:ssh://$basicUrl.git")
+                    developerConnection.set("scm:git:ssh://git@$basicUrl.git")
                     url.set("https://$basicUrl")
                 }
             }
         }
     }
+
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = System.getenv("OSSRH_USERNAME")
+                password = System.getenv("OSSRH_TOKEN")
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(System.getenv("GPG_PRIVATE_KEY"), System.getenv("GPG_PASSPHRASE"))
+    sign(publishing.publications["gpr"])
 }
