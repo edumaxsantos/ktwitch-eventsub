@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Java
@@ -25,33 +25,54 @@ jobs:
         with:
           java-version: '22'
           distribution: 'temurin'
+          cache: gradle
 
       - name: Import GPG Key
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
-          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
+          echo "$GPG_PRIVATE_KEY" | base64 --decode > private.key
+          gpg --batch --yes --import private.key
+          rm private.key
 
       - name: Configure GPG
-        run: |
-          echo "use-agent" >> ~/.gnupg/gpg.conf
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-
-      - name: Test GPG Signing
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          echo "test" | gpg --batch --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --sign --armor
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          gpgconf --kill gpg-agent
+          echo "disable-ipv6" >> ~/.gnupg/dirmngr.conf
+          gpgconf --kill dirmngr
+          echo RELOADAGENT | gpg-connect-agent
+          export GPG_TTY=$(tty)
 
-      - name: Debug GPG Configuration
-        run: cat ~/.gnupg/gpg.conf
+      - name: Verify GPG Key Import
+        run: |
+          gpg --list-secret-keys
+          gpg --list-keys
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper/
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
       - name: Publish to Maven Central
-        run: ./gradlew publish --info
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "GPG_PASSPHRASE=${GPG_PASSPHRASE}" >> $GITHUB_ENV
+          ./gradlew publish closeSonatypeStagingRepository releaseSonatypeStagingRepository --info

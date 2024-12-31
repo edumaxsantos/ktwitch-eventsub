@@ -25,17 +25,23 @@ tasks.test {
     useJUnitPlatform()
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(22))
+    }
+}
+
 kotlin {
     jvmToolchain(22)
 }
 
 publishing {
     publications {
-        register<MavenPublication>("gpr") {
+        register<MavenPublication>("mavenJava") {
             from(components["kotlin"])
-            groupId = project.group as String
+            groupId = project.group.toString()
             artifactId = project.name
-            version = project.version as String
+            version = project.version.toString()
 
             pom {
                 name.set("KTwitch EventSub")
