@@ -1,7 +1,7 @@
-package com.github.edumaxsantos.ktwitch.eventsub.websocket.event
+package io.github.edumaxsantos.ktwitch.eventsub.websocket.event
 
-import com.github.edumaxsantos.ktwitch.eventsub.SubType
-import com.github.edumaxsantos.ktwitch.eventsub.SubscriptionType
+import io.github.edumaxsantos.ktwitch.eventsub.SubType
+import io.github.edumaxsantos.ktwitch.eventsub.SubscriptionType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

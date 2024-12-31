@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.github.edumaxsantos.ktwitch"
+group = "io.github.edumaxsantos.ktwitch"
 version = "0.1.0"
 
 val basicUrl = "github.com/edumaxsantos/ktwitch-eventsub"

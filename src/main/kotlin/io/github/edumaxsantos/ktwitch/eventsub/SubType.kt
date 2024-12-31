@@ -1,4 +1,4 @@
-package com.github.edumaxsantos.ktwitch.eventsub
+package io.github.edumaxsantos.ktwitch.eventsub
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)

@@ -1,4 +1,4 @@
-package com.github.edumaxsantos.ktwitch.eventsub
+package io.github.edumaxsantos.ktwitch.eventsub
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

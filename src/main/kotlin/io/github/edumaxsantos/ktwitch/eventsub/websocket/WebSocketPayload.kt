@@ -1,9 +1,9 @@
-package com.github.edumaxsantos.ktwitch.eventsub.websocket
+package io.github.edumaxsantos.ktwitch.eventsub.websocket
 
-import com.github.edumaxsantos.ktwitch.eventsub.websocket.event.Event
-import com.github.edumaxsantos.ktwitch.eventsub.SubscriptionType
-import com.github.edumaxsantos.ktwitch.eventsub.SubscriptionTypeVersion
-import com.github.edumaxsantos.ktwitch.eventsub.Transport
+import io.github.edumaxsantos.ktwitch.eventsub.websocket.event.Event
+import io.github.edumaxsantos.ktwitch.eventsub.SubscriptionType
+import io.github.edumaxsantos.ktwitch.eventsub.SubscriptionTypeVersion
+import io.github.edumaxsantos.ktwitch.eventsub.Transport
 import kotlinx.serialization.Serializable
 import java.util.concurrent.locks.Condition
 
