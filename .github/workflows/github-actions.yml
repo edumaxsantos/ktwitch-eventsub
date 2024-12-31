@@ -27,6 +27,15 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Debug GPG Key Import
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
+          echo "Listing imported GPG keys:"
+          gpg --list-keys
+
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
@@ -40,15 +49,6 @@ jobs:
       - name: Verify Package Publication
         run: |
           curl -s https://maven.pkg.github.com/edumaxsantos/ktwitch-eventsub | grep -q ktwitch-eventsub || echo "Package not found or not public"
-
-      - name: Debug GPG Key Import
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: |
-          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
-          echo "Listing imported GPG keys:"
-          gpg --list-keys
           
 
         # Publish to Maven Central
