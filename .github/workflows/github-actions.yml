@@ -75,4 +75,4 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           echo "GPG_PASSPHRASE=${GPG_PASSPHRASE}" >> $GITHUB_ENV
-          ./gradlew nexusPublish --info
+          ./gradlew publishToSonatype --info
