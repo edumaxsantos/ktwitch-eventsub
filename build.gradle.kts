@@ -86,5 +86,5 @@ publishing {
 
 signing {
     useGpgCmd()
-    sign(publishing.publications["gpr"])
+    sign(publishing.publications["mavenJava"])
 }
