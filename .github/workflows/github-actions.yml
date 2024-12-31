@@ -11,48 +11,44 @@ name: Publish package to the Maven Central Repository and GitHub Packages
 on:
   release:
     types: [created]
+
 jobs:
   publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@v4
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           java-version: '22'
           distribution: 'temurin'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
 
-      - name: Debug GPG Key Import
+      - name: Import GPG Key
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         run: |
           echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
 
-      - name: Change wrapper permissions
-        run: chmod +x ./gradlew
-
-          # Configure GPG for non-interactive use
       - name: Configure GPG
         run: |
-         echo "use-agent" >> ~/.gnupg/gpg.conf
-         echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+
+      - name: Test GPG Signing
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "test" | gpg --batch --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --sign --armor
 
       - name: Debug GPG Configuration
         run: cat ~/.gnupg/gpg.conf
 
-      - name: Publish package
-        run: ./gradlew publish
+      - name: Publish to Maven Central
+        run: ./gradlew publish --info
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Verify Package Publication
-        run: |
-          curl -s https://maven.pkg.github.com/edumaxsantos/ktwitch-eventsub | grep -q ktwitch-eventsub || echo "Package not found or not public"
